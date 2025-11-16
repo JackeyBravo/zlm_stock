@@ -1,11 +1,11 @@
 import type { BacktestItem } from "../types/backtest";
 
 const GRADE_ORDER: Array<{ label: string; value: string; color: string }> = [
-  { label: "夯", value: "秀", color: "#ef4444" },
-  { label: "顶级", value: "顶级", color: "#fbbf24" },
-  { label: "人上人", value: "人上人", color: "#facc15" },
-  { label: "NPC", value: "NPC", color: "#e2e8f0" },
-  { label: "拉完了", value: "拉完了", color: "#cbd5f5" },
+  { label: "秀", value: "秀", color: "#fecaca" },
+  { label: "顶级", value: "顶级", color: "#fde68a" },
+  { label: "人上人", value: "人上人", color: "#fef3c7" },
+  { label: "NPC", value: "NPC", color: "#e5e7eb" },
+  { label: "拉完了", value: "拉完了", color: "#e0e7ff" },
 ];
 
 interface Props {

@@ -63,4 +63,3 @@ function formatNumber(value?: number) {
   if (value === undefined || Number.isNaN(value)) return "--";
   return value.toFixed(2);
 }
-

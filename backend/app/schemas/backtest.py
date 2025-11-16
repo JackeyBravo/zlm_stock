@@ -30,6 +30,17 @@ class EquityPoint(BaseModel):
     bench_nv: float
 
 
+class ItemEquityPoint(BaseModel):
+    date: date
+    ret: float
+
+
+class ItemEquitySeries(BaseModel):
+    code: str
+    name: str
+    points: List[ItemEquityPoint]
+
+
 class BacktestSummary(BaseModel):
     win_rate: float
     ret: float
@@ -54,6 +65,7 @@ class BacktestResponse(BaseModel):
     benchmark: str
     summary: BacktestSummary
     equity: List[EquityPoint]
+    item_equities: List[ItemEquitySeries] = Field(default_factory=list)
     items: List[BacktestItemSchema]
 
 
@@ -67,4 +79,3 @@ class BacktestRequest(BaseModel):
 
 class BacktestListResponse(BaseModel):
     items: List[BacktestResponse]
-

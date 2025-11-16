@@ -35,12 +35,23 @@ export interface BacktestItem {
   flags?: string[];
 }
 
+export interface ItemEquityPoint {
+  date: string;
+  ret: number;
+}
+
+export interface ItemEquitySeries {
+  code: string;
+  name: string;
+  points: ItemEquityPoint[];
+}
+
 export interface BacktestResponse {
   bt_id: string;
   window: BacktestWindow;
   benchmark: string;
   summary: BacktestSummary;
   equity: Array<{ date: string; portfolio_nv: number; bench_nv: number }>;
+  item_equities: ItemEquitySeries[];
   items: BacktestItem[];
 }
-

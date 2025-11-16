@@ -20,6 +20,8 @@ from ..schemas.backtest import (
     BacktestSummary,
     BacktestWindow,
     EquityPoint,
+    ItemEquityPoint,
+    ItemEquitySeries,
 )
 from .ths_client import TongHuaShunClient
 from .data_models import QuoteRecord
@@ -106,14 +108,16 @@ async def run_backtest(session: AsyncSession, payload: BacktestRequest) -> Backt
     session.add(backtest)
     await session.commit()
     loaded = await _load_backtest(session, bt_id)
-    return _serialize_backtest(loaded)
+    if not loaded:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="回测结果生成失败")
+    return await _serialize_backtest(session, loaded)
 
 
 async def get_backtest_response(session: AsyncSession, bt_id: str) -> BacktestResponse:
     backtest = await _load_backtest(session, bt_id)
     if not backtest:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="回测不存在")
-    return _serialize_backtest(backtest)
+    return await _serialize_backtest(session, backtest)
 
 
 async def _load_backtest(session: AsyncSession, bt_id: str) -> Backtest | None:
@@ -179,8 +183,9 @@ async def _load_quotes(session: AsyncSession, code: str, start: date, end: date)
 
 
 def _to_quote_view(obj: QuoteRecord | QuoteDaily) -> QuoteView:
+    trade_date = getattr(obj, "date", None) or getattr(obj, "trade_date")
     return QuoteView(
-        date=getattr(obj, "date", getattr(obj, "trade_date")),
+        date=trade_date,
         open=obj.open,
         close=obj.close,
         high=obj.high,
@@ -268,7 +273,7 @@ def _aggregate_summary(items: List[ItemCalcResult]) -> BacktestSummary:
     )
 
 
-def _serialize_backtest(bt: Backtest) -> BacktestResponse:
+async def _serialize_backtest(session: AsyncSession, bt: Backtest) -> BacktestResponse:
     items = [
         BacktestItemSchema(
             code=item.code,
@@ -299,14 +304,36 @@ def _serialize_backtest(bt: Backtest) -> BacktestResponse:
         EquityPoint(date=window.start, portfolio_nv=1.0, bench_nv=1.0),
         EquityPoint(date=window.end, portfolio_nv=1.0 + summary.ret, bench_nv=1.0 + summary.bench_ret),
     ]
+    item_equities = await _build_item_equities(session, bt.items)
     return BacktestResponse(
         bt_id=bt.bt_id,
         window=window,
         benchmark=bt.benchmark,
         summary=summary,
         equity=equity,
+        item_equities=item_equities,
         items=items,
     )
+
+
+async def _build_item_equities(session: AsyncSession, bt_items: Sequence[BacktestItem]) -> List[ItemEquitySeries]:
+    equities: List[ItemEquitySeries] = []
+    for bt_item in bt_items:
+        base_price = bt_item.buy_price or 0
+        if base_price <= 0:
+            continue
+        quotes = await _load_quotes(session, bt_item.code, bt_item.buy_date, bt_item.sell_date)
+        if not quotes:
+            continue
+        points: List[ItemEquityPoint] = []
+        for quote in quotes:
+            if quote.close <= 0:
+                continue
+            ret = quote.close / base_price - 1
+            points.append(ItemEquityPoint(date=quote.date, ret=ret))
+        if points:
+            equities.append(ItemEquitySeries(code=bt_item.code, name=bt_item.name, points=points))
+    return equities
 
 
 def _calc_daily_returns(quotes: List[QuoteDaily]) -> List[float]:

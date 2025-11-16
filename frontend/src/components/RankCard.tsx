@@ -10,15 +10,13 @@ interface Props {
 
 export function RankCard({ title, color, data, isLoading, error }: Props) {
   return (
-    <section className="rank-card" style={{ borderColor: color }}>
+    <section className="rank-card" style={{ borderColor: color, boxShadow: `6px 6px 0 ${hexToRgba(color)}` }}>
       <header>
         <h3>{title}</h3>
-        <span className="rank-meta">
-          最近 {data?.days ?? "-"} 日 · Top {data?.limit ?? "-"}
-        </span>
+        <span className="muted">最近 {data?.days ?? "-"} 日 · Top {data?.limit ?? "-"}</span>
       </header>
-      {isLoading && <p className="muted">加载中...</p>}
-      {error && <p className="error">{error.message}</p>}
+      {isLoading && <p className="muted status-text">加载中...</p>}
+      {error && <p className="error status-text">{error.message}</p>}
       {!isLoading && !error && (
         <ol>
           {(data?.items ?? []).map((item, idx) => (
@@ -36,3 +34,11 @@ export function RankCard({ title, color, data, isLoading, error }: Props) {
   );
 }
 
+function hexToRgba(hex: string) {
+  const normalized = hex.replace("#", "");
+  const bigint = parseInt(normalized, 16);
+  const r = (bigint >> 16) & 255;
+  const g = (bigint >> 8) & 255;
+  const b = bigint & 255;
+  return `rgba(${r}, ${g}, ${b}, 0.15)`;
+}

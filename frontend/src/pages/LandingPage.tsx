@@ -1,10 +1,10 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { RankCard } from "../components/RankCard";
 import { createBacktest } from "../hooks/useBacktest";
 import { useQuota } from "../hooks/useQuota";
 import { useRandomPick } from "../hooks/useRandomPick";
 import { useRank } from "../hooks/useRanks";
-import { RankCard } from "../components/RankCard";
 
 const BENCHMARKS = [
   { label: "沪深300", value: "HS300" },
@@ -18,6 +18,7 @@ export function LandingPage() {
   const [recommendDate, setRecommendDate] = useState(defaultRecommendDate());
   const [benchmark, setBenchmark] = useState("HS300");
   const [submitting, setSubmitting] = useState(false);
+
   const { quota, isLoading: quotaLoading } = useQuota();
   const { randomPick, isLoading: randomLoading, error: randomError, fetchRandom } = useRandomPick();
   const hotRank = useRank("hot");
@@ -60,33 +61,32 @@ export function LandingPage() {
 
   return (
     <div className="page landing-page">
-      <section className="hero">
-        <div>
-          <p className="eyebrow">准了么 · 快速验证推荐是否靠谱的工具</p>
-          <h1>输入股票 & 推荐日期，一键回测推荐的真伪</h1>
-          <p className="muted">默认以推荐日次日开盘买入，支持多股票批量验证，并提供近 10 日热门/优质/拉胯榜单。</p>
-          <p className="quota">{quotaText}</p>
+      <header className="app-header">
+        <div className="brand-block">
+          <span className="brand-title">准了么</span>
+          <span className="brand-tagline">快速验证推荐是否靠谱的工具</span>
         </div>
-      </section>
+        <span className="quota-chip">{quotaText}</span>
+      </header>
 
-      <div className="landing-main">
-        <section className="form-section narrow">
-          <label>
-            回测股票（名称或代码，空格/逗号/换行分割）
-            <textarea
-              value={stocksInput}
-              onChange={(e) => setStocksInput(e.target.value)}
-              placeholder="例如：平安银行 601318 000001"
-            />
-            <small>已输入 {parsedStocks.length} 只股票</small>
+      <div className="landing-layout">
+        <section className="panel form-panel">
+          <div className="panel-title">
+            <h2>回测配置</h2>
+            <p className="muted">默认以推荐日次日开盘价买入，可批量粘贴股票名称或代码</p>
+          </div>
+          <label className="field">
+            <span>回测股票（空格/逗号/换行分割）</span>
+            <textarea value={stocksInput} onChange={(e) => setStocksInput(e.target.value)} placeholder="例如：平安银行 601318 万科A 000002" />
+            <small className="muted">已输入 {parsedStocks.length} 只股票</small>
           </label>
           <div className="form-row">
-            <label>
-              推荐日期（默认当前日期前 5 个交易日）
+            <label className="field">
+              <span>推荐日期</span>
               <input type="date" value={recommendDate} onChange={(e) => setRecommendDate(e.target.value)} />
             </label>
-            <label>
-              对标指数
+            <label className="field">
+              <span>基准指数</span>
               <select value={benchmark} onChange={(e) => setBenchmark(e.target.value)}>
                 {BENCHMARKS.map((item) => (
                   <option key={item.value} value={item.value}>
@@ -96,7 +96,7 @@ export function LandingPage() {
               </select>
             </label>
           </div>
-          <div className="actions">
+          <div className="panel-actions">
             <button onClick={handleSubmit} disabled={submitting}>
               {submitting ? "回测中..." : "开始回测"}
             </button>
@@ -106,17 +106,20 @@ export function LandingPage() {
           </div>
           {randomPick && (
             <div className="random-card">
-              <strong>
-                随机推荐：{randomPick.name} ({randomPick.code})
-              </strong>
+              <div>
+                <strong>
+                  随机推荐：{randomPick.name} ({randomPick.code})
+                </strong>
+                <p className="muted">可直接复制填入输入框快速回测</p>
+              </div>
               {randomPick.grade && <span className="tag">{randomPick.grade}</span>}
             </div>
           )}
           {randomError && <p className="error">{randomError}</p>}
         </section>
 
-        <section className="rank-stack">
-          <RankCard title="近10日热门回测" color="#2563eb" data={hotRank.data} isLoading={hotRank.isLoading} error={hotRank.error as Error | undefined} />
+        <section className="rank-columns">
+          <RankCard title="近10日热门回测" color="#1d4ed8" data={hotRank.data} isLoading={hotRank.isLoading} error={hotRank.error as Error | undefined} />
           <RankCard title="近10日最夯回测" color="#d97706" data={bestRank.data} isLoading={bestRank.isLoading} error={bestRank.error as Error | undefined} />
           <RankCard title="近10日最拉回测" color="#dc2626" data={worstRank.data} isLoading={worstRank.isLoading} error={worstRank.error as Error | undefined} />
         </section>

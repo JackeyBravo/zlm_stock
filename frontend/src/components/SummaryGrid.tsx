@@ -18,12 +18,16 @@ interface Props {
 export function SummaryGrid({ summary }: Props) {
   return (
     <div className="summary-grid">
-      {STAT_KEYS.map(({ key, label, format }) => (
-        <div key={key} className="summary-card">
-          <span>{label}</span>
-          <strong>{format ? format(summary?.[key] as number) : formatNumber(summary?.[key] as number)}</strong>
-        </div>
-      ))}
+      {STAT_KEYS.map(({ key, label, format }) => {
+        const value = summary ? summary[key] : undefined;
+        const numerical = typeof value === "number" ? value : undefined;
+        return (
+          <div key={key} className="summary-card">
+            <span>{label}</span>
+            <strong>{format ? format(numerical) : formatNumber(numerical)}</strong>
+          </div>
+        );
+      })}
     </div>
   );
 }
