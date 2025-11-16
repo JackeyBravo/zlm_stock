@@ -198,9 +198,54 @@ button:disabled {
 
 .summary-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
   margin-bottom: 32px;
+}
+.summary-wrapper {
+  background: #fff;
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 32px;
+  display: flex;
+  gap: 24px;
+  align-items: stretch;
+  box-shadow: 0 10px 20px rgba(15, 23, 42, 0.05);
+}
+.summary-grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.grade-board {
+  flex: 0 0 320px;
+  display: flex;
+  flex-direction: column;
+  border-left: 1px solid #e2e8f0;
+  padding-left: 16px;
+}
+.grade-table {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+.grade-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: 12px;
+  color: #0f172a;
+  font-weight: 600;
+}
+.grade-label {
+  width: 60px;
+}
+.grade-stocks {
+  flex: 1;
+  font-weight: 500;
 }
 
 .summary-card {
@@ -268,6 +313,12 @@ td {
 }
 
 @media (max-width: 768px) {
+  .summary-wrapper {
+    flex-direction: column;
+  }
+  .summary-grid {
+    grid-template-columns: 1fr;
+  }
   .landing-main {
     flex-direction: column;
   }

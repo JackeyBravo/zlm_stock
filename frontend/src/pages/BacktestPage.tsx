@@ -2,6 +2,7 @@ import { useEffect, useMemo } from "react";
 import { Link, useLocation, useParams } from "react-router-dom";
 import { BacktestTable } from "../components/BacktestTable";
 import { SummaryGrid } from "../components/SummaryGrid";
+import { GradeBoard } from "../components/GradeBoard";
 import { useBacktest } from "../hooks/useBacktest";
 import type { BacktestResponse } from "../types/backtest";
 
@@ -40,7 +41,10 @@ export function BacktestPage() {
       {isLoading && <p className="muted">回测结果加载中...</p>}
       {error && <p className="error">{error.message}</p>}
 
-      <SummaryGrid summary={data?.summary} />
+      <div className="summary-wrapper">
+        <SummaryGrid summary={data?.summary} />
+        <GradeBoard items={data?.items} />
+      </div>
 
       <section className="chart-section">
         <header>
@@ -64,10 +68,9 @@ export function BacktestPage() {
           <li>T+1 开盘价买入，E 日（默认当前日）收盘价卖出。</li>
           <li>收益、年化、Sharpe、最大回撤、Calmar 按 PRD 公式计算，交易日数按 244 天年化。</li>
           <li>基准默认沪深 300，可切换上证指数/中证 1000。</li>
-          <li>数据源暂为 AKShare，若存在停牌/ST/无法成交的情况将标注 flag。</li>
+          <li>数据源使用同花顺/AKShare，若存在停牌/ST/无法成交的情况将标注 flag。</li>
         </ul>
       </section>
     </div>
   );
 }
-

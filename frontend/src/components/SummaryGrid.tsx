@@ -1,14 +1,13 @@
 import type { BacktestSummary } from "../types/backtest";
 
 const STAT_KEYS: Array<{ key: keyof BacktestSummary; label: string; format?: (v?: number) => string }> = [
-  { key: "win_rate", label: "胜率", format: formatPercent },
+  { key: "win_rate", label: "胜率统计", format: formatPercent },
+  { key: "mdd", label: "最大回撤", format: formatPercent },
   { key: "ret", label: "回测收益", format: formatPercent },
   { key: "ann", label: "回测年化", format: formatPercent },
   { key: "bench_ret", label: "大盘收益", format: formatPercent },
   { key: "bench_ann", label: "大盘年化", format: formatPercent },
-  { key: "excess", label: "超额收益", format: formatPercent },
   { key: "sharpe", label: "Sharpe" },
-  { key: "mdd", label: "最大回撤", format: formatPercent },
   { key: "calmar", label: "Calmar" },
 ];
 
@@ -38,4 +37,3 @@ function formatNumber(value?: number) {
   if (value === undefined || Number.isNaN(value)) return "--";
   return value.toFixed(2);
 }
-
